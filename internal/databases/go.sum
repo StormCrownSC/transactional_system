@@ -1,0 +1,4 @@
+github.com/StormCrownSC/transactional_system/internal/structures v0.0.0-20230910160405-d0d650838552 h1:f3lAz5QFnaVLri8Z8WJpj5OuYx/oiid89v5CpqIGMOI=
+github.com/StormCrownSC/transactional_system/internal/structures v0.0.0-20230910160405-d0d650838552/go.mod h1:ES4C/x+R3ARlE9JiEOTEYn656UlfhUqY1ujyOOxvdQw=
+github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
+github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
