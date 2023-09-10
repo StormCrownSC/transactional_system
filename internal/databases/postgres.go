@@ -2,7 +2,6 @@ package databases
 
 import (
 	"database/sql"
-	"internal/structures"
 	"strconv"
 	"strings"
 
