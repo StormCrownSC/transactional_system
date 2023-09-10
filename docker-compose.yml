@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+
+  postgres:
+    hostname: transactional.postgres
+    build: 
+      context: ./
+      dockerfile: build/Dockerfile.postgres
+    volumes:
+      - ./build/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}"]
+      interval: 50s
+      timeout: 50s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 2s
+        max_attempts: 3
+        window: 10m
+
+  api:
+    hostname: api.transactional
+    build:
+      context: ./
+      dockerfile: build/Dockerfile.api
+    stdin_open: true
+    tty: true
+    ports:
+     - "8050:8050"
+    env_file:
+      - .env
+    healthcheck:
+      test: curl -sS http://api.transactional:8050/balance || echo 1
+      interval: 10s
+      timeout: 10s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.4'
+          memory: '4g'
+      restart_policy:
+        condition: on-failure
+        delay: 2s
+        max_attempts: 3
+        window: 10m
