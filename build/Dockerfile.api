@@ -1,0 +1,22 @@
+# Базовый образ
+FROM golang:1.20-alpine as builder
+
+RUN mkdir /cmd
+RUN mkdir /internal
+ADD ./cmd /cmd/
+ADD ./internal /internal/
+WORKDIR /cmd
+
+RUN apk update && apk add --no-cache git ca-certificates && \
+    if [ -f main ]; then rm main; fi && \
+    go get -u && go mod tidy && \
+    CGO_ENABLED=0 go build -ldflags="-s -w" -o main .
+
+# Конечный образ
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/cmd
+COPY --from=builder /cmd/main .
+COPY ./.env .
+
+CMD ["./main"]
