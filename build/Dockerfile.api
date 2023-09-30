@@ -1,22 +1,17 @@
-# Базовый образ
-FROM golang:1.20-alpine as builder
+FROM golang:1.21-alpine as gobuild
 
-RUN mkdir /cmd
-RUN mkdir /internal
-ADD ./cmd /cmd/
-ADD ./internal /internal/
-WORKDIR /cmd
+WORKDIR /app
 
-RUN apk update && apk add --no-cache git ca-certificates && \
-    if [ -f main ]; then rm main; fi && \
-    go get -u && go mod tidy && \
-    CGO_ENABLED=0 go build -ldflags="-s -w" -o main .
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+COPY . .
 
-# Конечный образ
+RUN go build ./cmd/main.go
+
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/cmd
-COPY --from=builder /cmd/main .
-COPY ./.env .
+WORKDIR /app
+
+COPY --from=gobuild /app .
 
 CMD ["./main"]
