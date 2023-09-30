@@ -1,13 +1,12 @@
 package handler
 
 import (
+	"Service/internal/databases"
+	"Service/internal/structures"
 	"database/sql"
 	"fmt"
 	"net/http"
 	"unicode"
-
-	"github.com/StormCrownSC/transactional_system/internal/databases"
-	"github.com/StormCrownSC/transactional_system/internal/structures"
 
 	"github.com/gin-gonic/gin"
 )

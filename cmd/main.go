@@ -1,10 +1,9 @@
 package main
 
 import (
+	"Service/internal/databases"
+	"Service/internal/handler"
 	"log"
-
-	"github.com/StormCrownSC/transactional_system/internal/databases"
-	"github.com/StormCrownSC/transactional_system/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )

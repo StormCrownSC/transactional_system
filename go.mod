@@ -1,15 +1,13 @@
-module github.com/StormCrownSC/transactional_system
+module Service
 
-go 1.20
+go 1.21.1
 
 require (
-	github.com/StormCrownSC/transactional_system/internal/databases v0.0.0-20230910185516-93aa01fc591b
-	github.com/StormCrownSC/transactional_system/internal/handler v0.0.0-20230910185516-93aa01fc591b
 	github.com/gin-gonic/gin v1.9.1
+	github.com/lib/pq v1.10.9
 )
 
 require (
-	github.com/StormCrownSC/transactional_system/internal/structures v0.0.0-20230910184125-8c4460e25232 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
@@ -21,7 +19,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect

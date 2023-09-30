@@ -1,11 +1,11 @@
 package databases
 
 import (
+	"Service/internal/structures"
 	"database/sql"
 	"strconv"
 	"strings"
 
-	"github.com/StormCrownSC/transactional_system/internal/structures"
 	_ "github.com/lib/pq"
 )
 
