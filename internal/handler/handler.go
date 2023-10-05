@@ -5,6 +5,7 @@ import (
 	"Service/internal/structures"
 	"database/sql"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http"
 	"unicode"
 
@@ -55,7 +56,7 @@ func WithdrawFunds(c *gin.Context, db *sql.DB) {
 }
 
 // Function for getting the current and frozen customer balance
-func GetClientBalance(c *gin.Context, db *sql.DB) {
+func GetClientBalance(c *gin.Context, db *pgxpool.Pool) {
 	// Extracting the request parameters
 	clientAccountStr := c.Query("client_account")
 
