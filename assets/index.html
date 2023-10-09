@@ -5,6 +5,82 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+    <form id="invoice" method="post" enctype="application/x-www-form-urlencoded">
+        <label for="amount">Введите сумму для пополнения:</label>
+        <input type="text" id="amountin" name="amountin">
+        <button type="submit">Пополнить</button>
+    </form><br/>
+    <form id="withdraw" method="post" enctype="application/x-www-form-urlencoded">
+        <label for="amount">Введите сумму для снятия:</label>
+        <input type="text" id="amountout" name="amountout">
+        <button type="submit">Снять</button>
+    </form>
+    <br/>
+    <button type="chek" id="chek">Узнать баланс</button>
+    <div id="result"></div>
 
+  <script>
+    const invoice = document.querySelector('#invoice');
+
+    invoice.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const amount = parseFloat(invoice.elements.amountin.value)*1.0;
+        request = {"currency": "AED", "amount":amount, "account":"12345678901234567890"}
+        try {
+            const response = await fetch('http://localhost:8050/invoice', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body:JSON.stringify(request),
+            });
+            const data = await response.json();
+    } catch (error){
+        alert(`Download error: ${error.message}`);
+    }
+    });
+
+    const withdraw = document.querySelector('#withdraw');
+
+    withdraw.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const amount = parseFloat(withdraw.elements.amountout.value)*1.0;
+        request = {"currency": "AED", "amount":amount, "account":"12345678901234567890"}
+        try {
+            const response = await fetch('http://localhost:8050/withdraw', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/jsosn'
+                },
+                body: JSON.stringify(request)
+            });
+            const data = await response.json();
+        }catch(error){
+            alert(`Download error: ${error.message}`);
+        }
+    });
+
+    const button = document.querySelector('#chek');
+    const result = document.querySelector('#result');
+
+    button.addEventListener('click', async () => {
+        try{
+            const response = await fetch('http://localhost:8050/balance?client_account=12345678901234567890', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            result.textContent =""
+            Array.from(data,
+                (x) => result.insertAdjacentHTML("beforeEnd", "<p> Ваш баланс( " + x.CurrencyCode + " ): " +x.ActualBalance+ " </p>")
+            )
+        }catch(error){
+            alert(`Download error: ${error.message}`);
+        }
+        // result.textContent = 'Ваш баланс:' + data;
+    });
+</script>
 </body>
 </html>
