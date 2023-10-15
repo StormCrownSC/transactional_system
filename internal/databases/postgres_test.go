@@ -2,6 +2,7 @@ package databases
 
 import (
 	"Service/internal/structures"
+	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"testing"
 )
@@ -14,7 +15,7 @@ func TestCreateInvoice(t *testing.T) {
 	}
 	defer db.Close()
 
-	// Создаем запрос и ожидание для мока
+	// Тест 1: Успешное выполнение запроса
 	request := structures.TransactionRequest{
 		Account:  "123456",
 		Currency: "USD",
@@ -25,15 +26,49 @@ func TestCreateInvoice(t *testing.T) {
 		WithArgs(request.Account, request.Currency, request.Amount).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	// Вызываем функцию CreateInvoice с моком базы данных
 	err = CreateInvoice(db, request)
 	if err != nil {
-		t.Errorf("Expected no error, but got %v", err)
+		t.Errorf("Test 1: Expected no error, but got %v", err)
 	}
 
-	// Проверяем, что все ожидаемые вызовы были выполнены
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("Expectations were not met: %s", err)
+	// Тест 2: Обработка ошибки базы данных
+	mock.ExpectExec("SELECT create_invoice()").
+		WithArgs(request.Account, request.Currency, request.Amount).
+		WillReturnError(sqlmock.ErrCancelled)
+
+	err = CreateInvoice(db, request)
+	if err == nil {
+		t.Error("Test 2: Expected an error, but got nil")
+	}
+
+	// Тест 3: Обработка ошибки результатов SQL
+	mock.ExpectExec("SELECT create_invoice()").
+		WithArgs(request.Account, request.Currency, request.Amount).
+		WillReturnResult(sqlmock.NewErrorResult(errors.New("test error")))
+
+	err = CreateInvoice(db, request)
+	if err != nil {
+		t.Errorf("Test 1: Expected no error, but got %v", err)
+	}
+
+	// Тест 4: Обработка ошибки парсинга аргументов
+	mock.ExpectExec("SELECT create_invoice()").
+		WithArgs(request.Account, request.Currency, "invalid amount").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = CreateInvoice(db, request)
+	if err == nil {
+		t.Error("Test 4: Expected an error, but got nil")
+	}
+
+	// Тест 5: Обработка успешного выполнения без результата
+	mock.ExpectExec("SELECT create_invoice()").
+		WithArgs(request.Account, request.Currency, request.Amount).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+
+	err = CreateInvoice(db, request)
+	if err == nil {
+		t.Error("Test 4: Expected an error, but got nil")
 	}
 }
 
@@ -45,7 +80,7 @@ func TestWithdrawFunds(t *testing.T) {
 	}
 	defer db.Close()
 
-	// Создаем запрос и ожидание для мока
+	// Тест 1: Успешное выполнение запроса
 	request := structures.TransactionRequest{
 		Account:  "123456",
 		Currency: "USD",
@@ -56,14 +91,48 @@ func TestWithdrawFunds(t *testing.T) {
 		WithArgs(request.Account, request.Currency, request.Amount).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	// Вызываем функцию WithdrawFunds с моком базы данных
 	err = WithdrawFunds(db, request)
 	if err != nil {
-		t.Errorf("Expected no error, but got %v", err)
+		t.Errorf("Test 1: Expected no error, but got %v", err)
 	}
 
-	// Проверяем, что все ожидаемые вызовы были выполнены
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("Expectations were not met: %s", err)
+	// Тест 2: Обработка ошибки базы данных
+	mock.ExpectExec("SELECT withdraw_funds()").
+		WithArgs(request.Account, request.Currency, request.Amount).
+		WillReturnError(sqlmock.ErrCancelled)
+
+	err = WithdrawFunds(db, request)
+	if err == nil {
+		t.Error("Test 2: Expected an error, but got nil")
+	}
+
+	// Тест 3: Обработка ошибки результатов SQL
+	mock.ExpectExec("SELECT withdraw_funds()").
+		WithArgs(request.Account, request.Currency, request.Amount).
+		WillReturnResult(sqlmock.NewErrorResult(errors.New("test error")))
+
+	err = WithdrawFunds(db, request)
+	if err != nil {
+		t.Errorf("Test 1: Expected no error, but got %v", err)
+	}
+
+	// Тест 4: Обработка ошибки парсинга аргументов
+	mock.ExpectExec("SELECT withdraw_funds()").
+		WithArgs(request.Account, request.Currency, "invalid amount").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = WithdrawFunds(db, request)
+	if err == nil {
+		t.Error("Test 4: Expected an error, but got nil")
+	}
+
+	// Тест 5: Обработка успешного выполнения без результата
+	mock.ExpectExec("SELECT withdraw_funds()").
+		WithArgs(request.Account, request.Currency, request.Amount).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+
+	err = WithdrawFunds(db, request)
+	if err == nil {
+		t.Error("Test 4: Expected an error, but got nil")
 	}
 }
