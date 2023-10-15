@@ -17,12 +17,6 @@ func main() {
 	}
 	defer db.Close()
 
-	pool, err := databases.ConnectPgxDB()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	r := gin.Default() // Creating a Gin Router
 
 	// We specify the path to static files and the route for servicing static files
@@ -35,7 +29,7 @@ func main() {
 		handler.WithdrawFunds(c, db)
 	})
 	r.GET("/balance", func(c *gin.Context) {
-		handler.GetClientBalance(c, pool)
+		handler.GetClientBalance(c, db)
 	})
 
 	r.Run(":8050")

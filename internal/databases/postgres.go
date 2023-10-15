@@ -2,9 +2,7 @@ package databases
 
 import (
 	"Service/internal/structures"
-	"context"
 	"database/sql"
-	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 	"strconv"
 	"strings"
@@ -36,23 +34,6 @@ func ConnectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func ConnectPgxDB() (*pgxpool.Pool, error) {
-	// Open a database connection and create a connection pool
-
-	pool, err := pgxpool.New(context.Background(), connStr)
-	if err != nil {
-		return nil, err
-	}
-
-	// Checking the connection to the database
-	err = pool.Ping(context.Background())
-	if err != nil {
-		pool.Close()
-		return nil, err
-	}
-	return pool, nil
-}
-
 // CreateInvoice creates a new invoice and returns an error in case of failure
 func CreateInvoice(db *sql.DB, request structures.TransactionRequest) error {
 	// Prepare the SQL statement to call the stored procedure
@@ -72,9 +53,9 @@ func WithdrawFunds(db *sql.DB, request structures.TransactionRequest) error {
 }
 
 // Function for getting customer balances in all currencies
-func GetClientBalances(db *pgxpool.Pool, clientAccount string) ([]structures.ClientBalance, error) {
+func GetClientBalances(db *sql.DB, clientAccount string) ([]structures.ClientBalance, error) {
 	// Prepare the SQL statement to call the stored procedure
-	rows, err := db.Query(context.Background(), "SELECT * FROM get_client_balances($1)", clientAccount)
+	rows, err := db.Query("SELECT * FROM get_client_balances($1)", clientAccount)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +64,7 @@ func GetClientBalances(db *pgxpool.Pool, clientAccount string) ([]structures.Cli
 	var clientBalances []structures.ClientBalance
 	for rows.Next() {
 		var currencyCode, actualBalanceStr, frozenBalanceStr string
-		err := rows.Scan(&currencyCode, &actualBalanceStr, &frozenBalanceStr)
+		err = rows.Scan(&currencyCode, &actualBalanceStr, &frozenBalanceStr)
 		if err != nil {
 			return nil, err
 		}

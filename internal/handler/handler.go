@@ -5,14 +5,13 @@ import (
 	"Service/internal/structures"
 	"database/sql"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http"
 	"unicode"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Create Invoice handler for creating an invoice
+// CreateInvoice Create Invoice handler for creating an invoice
 func CreateInvoice(c *gin.Context, db *sql.DB) {
 	// Request and Parameter processing
 	var request structures.TransactionRequest
@@ -34,7 +33,7 @@ func CreateInvoice(c *gin.Context, db *sql.DB) {
 	})
 }
 
-// WithdrawFundsHandler handles the withdrawal of funds
+// WithdrawFunds handles the withdrawal of funds
 func WithdrawFunds(c *gin.Context, db *sql.DB) {
 	// Request and Parameter processing
 	var request structures.TransactionRequest
@@ -55,8 +54,8 @@ func WithdrawFunds(c *gin.Context, db *sql.DB) {
 	})
 }
 
-// Function for getting the current and frozen customer balance
-func GetClientBalance(c *gin.Context, db *pgxpool.Pool) {
+// GetClientBalance function for getting the current and frozen customer balance
+func GetClientBalance(c *gin.Context, db *sql.DB) {
 	// Extracting the request parameters
 	clientAccountStr := c.Query("client_account")
 
