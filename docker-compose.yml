@@ -35,22 +35,9 @@ services:
     tty: true
     ports:
      - "8050:8050"
+     - "8060:8060"
     env_file:
       - .env
-    healthcheck:
-      test: curl -sS http://api.transactional:8050/balance || echo 1
-      interval: 10s
-      timeout: 10s
     depends_on:
       postgres:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          cpus: '0.4'
-          memory: '4g'
-      restart_policy:
-        condition: on-failure
-        delay: 2s
-        max_attempts: 3
-        window: 10m
