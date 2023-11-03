@@ -87,6 +87,15 @@ func GetClientBalances(db *sql.DB, clientAccount string) ([]structures.ClientBal
 	return clientBalances, nil
 }
 
+func DeleteClients(db *sql.DB, clientAccount string) bool {
+	_, err := db.Exec("DELETE FROM clients WHERE account_number = $1 OR card_number = $1", clientAccount)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 // ParseBalanceString converts the balance line in the format "$1,000.00" to float64.
 func ParseBalanceString(balanceStr string) (float64, error) {
 	// Remove "$" and "," characters from balanceStr

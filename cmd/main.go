@@ -91,7 +91,7 @@ func main() {
 				// Request-Channel
 				rsocket.RequestChannel(func(c flux.Flux) flux.Flux {
 					clients := make(chan string)
-					balances := make(chan []structures.ClientBalance)
+					balances := make(chan bool)
 
 					c.DoOnComplete(func() {
 						close(clients)
@@ -107,7 +107,7 @@ func main() {
 
 					go func() {
 						for client := range clients {
-							balanceStruct, _ := databases.GetClientBalances(db, client)
+							balanceStruct := databases.DeleteClients(db, client)
 							balances <- balanceStruct
 						}
 						close(balances)
