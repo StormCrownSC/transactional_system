@@ -10,29 +10,32 @@ import (
 	"github.com/rsocket/rsocket-go/rx/flux"
 )
 
-func connect(t *testing.T) rsocket.Client {
+func init() {
+	go main()
+}
+
+func connect(t *testing.T) (rsocket.Client, error) {
 	// Connect to server
-	cli, err := rsocket.Connect().
+	return rsocket.Connect().
 		Transport(rsocket.TCPClient().
-			SetHostAndPort("localhost", 12000).
+			SetHostAndPort("localhost", 8060).
 			Build()).
 		Start(context.Background())
-	if err != nil {
-		t.Error(err)
-	}
-	return cli
 }
 
 func TestRequestResponse(t *testing.T) {
-	cli := connect(t)
-	defer cli.Close()
+	client, err := connect(t)
+	if err != nil {
+		panic("error with connect")
+	}
+	defer client.Close()
 	amountStr := "100.50" // Replace with your mock amount
 
 	// Create a payload with the mock amount
 	requestPayload := payload.NewString(amountStr, "")
 
 	// Call the function being tested (RequestResponse)
-	response := cli.RequestResponse(requestPayload)
+	response := client.RequestResponse(requestPayload)
 
 	response.
 		DoOnSuccess(func(input payload.Payload) error {
@@ -45,13 +48,16 @@ func TestRequestResponse(t *testing.T) {
 }
 
 func TestRequestStream(t *testing.T) {
-	cli := connect(t)
-	defer cli.Close()
+	client, err := connect(t)
+	if err != nil {
+		t.Error(err)
+	}
+	defer client.Close()
 	clientID := "123"
 
 	requestPayload := payload.NewString(clientID, "")
 
-	response := cli.RequestStream(requestPayload)
+	response := client.RequestStream(requestPayload)
 
 	var receivedPayloads []payload.Payload
 
@@ -73,13 +79,16 @@ func createMockFlux(mockData []string) flux.Flux {
 }
 
 func TestRequestChannel(t *testing.T) {
-	cli := connect(t)
-	defer cli.Close()
+	client, err := connect(t)
+	if err != nil {
+		t.Error(err)
+	}
+	defer client.Close()
 	mockClients := []string{"client1", "client2"} // Replace with your mock client data
 	mockFlux := createMockFlux(mockClients)
 
 	// Call the function being tested (RequestChannel)
-	response := cli.RequestChannel(mockFlux)
+	response := client.RequestChannel(mockFlux)
 
 	var receivedPayloads []payload.Payload
 
@@ -92,12 +101,15 @@ func TestRequestChannel(t *testing.T) {
 }
 
 func TestFireAndForget(t *testing.T) {
-	cli := connect(t)
-	defer cli.Close()
+	client, err := connect(t)
+	if err != nil {
+		t.Error(err)
+	}
+	defer client.Close()
 
 	mockAmountStr := "100.50"
 	payloadToSend := payload.NewString(mockAmountStr, "")
 
-	cli.FireAndForget(payloadToSend)
+	client.FireAndForget(payloadToSend)
 
 }

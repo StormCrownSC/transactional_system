@@ -7,8 +7,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/contrib/static"
-	"github.com/gin-gonic/gin"
 	"github.com/rsocket/rsocket-go"
 	"github.com/rsocket/rsocket-go/payload"
 	"github.com/rsocket/rsocket-go/rx/flux"
@@ -22,27 +20,16 @@ func main() {
 	log.Println("Start app")
 	db, err := databases.ConnectDB()
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
-	defer db.Close()
 
 	wg := &sync.WaitGroup{}
-	wg.Add(2)
+	wg.Add(1)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
 		defer wg.Done()
-		r := gin.Default()
-		// We specify the path to static files and the route for servicing static files
-		r.Use(static.Serve("/", static.LocalFile("./assets", true)))
-		r.Run(":8050")
-	}()
-
-	// Rsocket
-	go func() {
-		defer wg.Done()
 		err := rsocket.Receive().OnStart(func() {
-			log.Println("Server Started")
 		}).Acceptor(func(_ context.Context, _ payload.SetupPayload, _ rsocket.CloseableRSocket) (rsocket.RSocket, error) {
 			return rsocket.NewAbstractSocket(
 				// Request-Response
